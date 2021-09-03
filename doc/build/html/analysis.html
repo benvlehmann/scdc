@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analysis tools &#8212; scdc 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Initial distribution" href="initial.html" />
+    <link rel="prev" title="Structure of the code" href="code_structure.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="initial.html" title="Initial distribution"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="code_structure.html" title="Structure of the code"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Analysis tools</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="analysis-tools">
+<h1>Analysis tools<a class="headerlink" href="#analysis-tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-scdc.analyze">
+<span id="analysis-functions"></span><h2>Analysis functions<a class="headerlink" href="#module-scdc.analyze" title="Permalink to this headline">¶</a></h2>
+<p>This module defines functions for analysis of simulated ensembles.</p>
+<p>Many of these are ‘old’, in that they were written at one time for a type of
+analysis that has not been used since. Many are also undocumented. However,
+they are preserved here for future applications.</p>
+<dl class="py function">
+<dt id="scdc.analyze.norm_asymmetry">
+<code class="sig-prename descclassname">scdc.analyze.</code><code class="sig-name descname">norm_asymmetry</code><span class="sig-paren">(</span><em class="sig-param">angles</em>, <em class="sig-param">distance_function=&lt;function p_dist.&lt;locals&gt;._dist&gt;</em>, <em class="sig-param">n_bins=50</em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.analyze.norm_asymmetry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the asymmetry as the distance from an isotropic distribution.</p>
+<p>For any norm, this will give zero for perfectly isotropic scattering. The
+maximum depends on the norm. For the default L^1 norm, if the scattering is
+purely directional, corresponding to a delta function, the difference will
+be 0.5 over the whole interval and then the delta function integrates to 1,
+so that’ll be a maximum of 2. For the L^2 norm, the norm of the delta is
+not well defined.</p>
+<p>** However, because of the default L^1 behavior, the result is divided by
+2 regardless of the distance function. **</p>
+<p>Because we’re working with a histogram anyway, we don’t want to use any
+actual quadrature. Instead, we want to use a p-norm of some kind. So the
+distance function here is not really a norm, but a single-point integrand
+thereof. For example, to use an L^2 norm, the distance function should be</p>
+<blockquote>
+<div><p>lambda x: np.abs(x)**2</p>
+</div></blockquote>
+<p>and the rest will be taken care of internally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angles</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – cos(theta) values. A <cite>ParticleCollection</cite>
+object can be provided instead.</p></li>
+<li><p><strong>distance_function</strong> (<em>function</em><em>, </em><em>optional</em>) – a function of one variable
+giving the integrand of the norm. Defaults to <cite>p_dist(1)</cite>.</p></li>
+<li><p><strong>n_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – number of bins to use for the norm. Defaults
+to 50.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>norm/2 of the distance from an isotropic distribution.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="scdc.analyze.p_dist">
+<code class="sig-prename descclassname">scdc.analyze.</code><code class="sig-name descname">p_dist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.analyze.p_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory for L^p-norm integrands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>float</em>) – p for the L^p norm.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>L^p norm integrand as a function of one argument.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="scdc.analyze.plane_asymmetry">
+<code class="sig-prename descclassname">scdc.analyze.</code><code class="sig-name descname">plane_asymmetry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">angles</span></em>, <em class="sig-param"><span class="n">n_bins</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.analyze.plane_asymmetry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the asymmetry in a sliding bin of fixed width in cos(theta).</p>
+<p>For cos(theta) = 1, this corresponds to forward-backward asymmetry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angles</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – cos(theta) values. A <cite>ParticleCollection</cite>
+object can be provided instead.</p></li>
+<li><p><strong>width</strong> (<em>float</em><em>, </em><em>optional</em>) – width of the sliding bin. Defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="scdc.analyze.qp_angle_pairs">
+<code class="sig-prename descclassname">scdc.analyze.</code><code class="sig-name descname">qp_angle_pairs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.analyze.qp_angle_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Final-state QP angles in canonical pairs.</p>
+<p>Here ‘canonical’ pairing means the following. The number of quasiparticles
+produced in any event must be even, so we sort them by energy and then
+divide into a low-energy half and a high-energy half. The lowest low-energy
+QP is paired with the lowest high-energy QP, the second-lowest with the
+second-lowest, and so on. There is nothing important about this order
+except that it is well-defined.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference internal" href="code_structure.html#scdc.event.Event" title="scdc.event.Event"><em>Event</em></a>) – the event for which to find final-state QP pairs.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a 2d array in which each row is a pair.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scdc.plot">
+<span id="plotting-functions"></span><h2>Plotting functions<a class="headerlink" href="#module-scdc.plot" title="Permalink to this headline">¶</a></h2>
+<p>This module defines plotting styles and routines. Some are out of date
+but are retained for possible future use.</p>
+<dl class="py function">
+<dt id="scdc.plot.latex_exp_format">
+<code class="sig-prename descclassname">scdc.plot.</code><code class="sig-name descname">latex_exp_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">mfmt</span><span class="o">=</span><span class="default_value">'%.3f'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.plot.latex_exp_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a number in scientific notation in LaTeX.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – number to format.</p></li>
+<li><p><strong>mfmt</strong> (<em>str</em><em>, </em><em>optional</em>) – format string for mantissa. Defaults to ‘%.3f’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>LaTeX string (no $’s).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="scdc.plot.tree_plot">
+<code class="sig-prename descclassname">scdc.plot.</code><code class="sig-name descname">tree_plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">particle</span></em>, <em class="sig-param"><span class="n">origin</span><span class="o">=</span><span class="default_value">(0, 0)</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.plot.tree_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot all child scattering events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Figure</span></code>, optional) – matplotlib figure object.</p></li>
+<li><p><strong>ax</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">AxesSubplot</span></code>, optional) – matplotlib axis object.</p></li>
+<li><p><strong>origin</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional) – starting
+coordinates for the tree.</p></li>
+<li><p><strong>dm_color</strong> (<em>str</em><em>, </em><em>optional</em>) – color for DM lines.</p></li>
+<li><p><strong>phonon_color</strong> (<em>str</em><em>, </em><em>optional</em>) – color for phonon lines.</p></li>
+<li><p><strong>qp_color</strong> (<em>str</em><em>, </em><em>optional</em>) – color for quasiparticle lines.</p></li>
+<li><p><strong>min_linewidth</strong> (<em>float</em><em>, </em><em>optional</em>) – smallest linewidth (E = Delta).</p></li>
+<li><p><strong>max_linewidth</strong> (<em>float</em><em>, </em><em>optional</em>) – largest linewidth, corresponding
+to the energy of the initial excitation.</p></li>
+<li><p><strong>max_linewidth_energy</strong> (<em>float</em><em>, </em><em>optional</em>) – energy for max linewidth.</p></li>
+<li><p><strong>final_distance</strong> (<em>float</em><em>, </em><em>optional</em>) – if specified, final (ballistic)
+state lines will be extended to this distance from (0, 0).</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – opacity.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Analysis tools</a><ul>
+<li><a class="reference internal" href="#module-scdc.analyze">Analysis functions</a></li>
+<li><a class="reference internal" href="#module-scdc.plot">Plotting functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="code_structure.html"
+                        title="previous chapter">Structure of the code</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="initial.html"
+                        title="next chapter">Initial distribution</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/analysis.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="initial.html" title="Initial distribution"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="code_structure.html" title="Structure of the code"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Analysis tools</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, the authors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.0.
+    </div>
+  </body>
+</html>

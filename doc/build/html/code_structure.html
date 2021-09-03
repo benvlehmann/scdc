@@ -1,0 +1,1453 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Structure of the code &#8212; scdc 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Analysis tools" href="analysis.html" />
+    <link rel="prev" title="Kinematics" href="kinematics.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Analysis tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="kinematics.html" title="Kinematics"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Structure of the code</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="structure-of-the-code">
+<h1>Structure of the code<a class="headerlink" href="#structure-of-the-code" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-scdc.event">
+<span id="events-and-down-conversion"></span><h2>Events and down-conversion<a class="headerlink" href="#module-scdc.event" title="Permalink to this headline">¶</a></h2>
+<p>The structure of the calculation is as follows.</p>
+<p>A scattering event produces two quasiparticles. Each of those quasiparticles
+can subsequently relax by emitting phonons. If sufficiently energetic, those
+phonons can themselves decay to quasiparticle pairs. The process continues
+until none of the products have enough energy to undergo another scatter or
+decay.</p>
+<p>This picture describes a tree of particles with interactions as the nodes of
+the tree, and we use a very similar structure to implement the calculation
+programmatically. Our tree consists of three types of object:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Event</p></li>
+<li><p>Interaction</p></li>
+<li><p>Particle</p></li>
+</ul>
+</div></blockquote>
+<p>In tree language, <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> objects are nodes and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> objects
+are edges. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> objects couple a single <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> object to
+a collection of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> objects.</p>
+<p>Why not just have <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> objects? Because a
+third type (<a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a>) is required to specify the relationship between the
+two. The <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> types certainly need to know
+about <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> types in order to create the final state of each
+interaction. But then how would a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> know about
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> types for which it can be an initial state?
+Alternatively, how would each <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> type know about all the
+others? At a technical level, this would require a circular import. At a
+conceptual level, it indicates a mutual dependency between <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> types that deserves its own container.</p>
+<p>So instead, the structure is as follows. The nodes in the tree
+are <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> objects. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> objects are the edges
+between <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> objects. The <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> objects “know”
+what <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> types are possible for a given <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>, and
+they use such an <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> object internally to produce a new final
+state. The <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> can then create new <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a> nodes at which to
+terminate each final-state <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>.</p>
+<p>Each <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> can also be physically prohibited. When this happens,
+the “initial” state of such an <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code> is a leaf of the tree.</p>
+<dl class="py class">
+<dt id="scdc.event.Event">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.event.</code><code class="sig-name descname">Event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_state</span></em>, <em class="sig-param"><span class="n">material</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.event.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interaction tree node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>) – particles in the
+initial state. The initial state is always listlike, even if it
+contains only one object.</p></li>
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – the material in which this takes place.</p></li>
+<li><p><strong>final_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>, optional) – particles in
+the final state. This is passed to the internal <code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code>
+object if supplied.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.event.Event.initial_state">
+<code class="sig-name descname">initial_state</code><a class="headerlink" href="#scdc.event.Event.initial_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>particles in the
+initial state. The initial state is always a list, even if it
+contains only one object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.event.Event.final_state">
+<code class="sig-name descname">final_state</code><a class="headerlink" href="#scdc.event.Event.final_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>particles in
+the final state if and only if supplied at initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">material (obj</code></dt>
+<dd><p><cite>Material</cite>): the material in which this takes place.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.event.Event.interaction">
+<code class="sig-name descname">interaction</code><a class="headerlink" href="#scdc.event.Event.interaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>the interaction which can take place
+given the supplied initial state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.event.Event.out">
+<code class="sig-name descname">out</code><a class="headerlink" href="#scdc.event.Event.out" title="Permalink to this definition">¶</a></dt>
+<dd><p>particle <cite>Event</cite> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.event.Event.final">
+<code class="sig-name descname">final</code><a class="headerlink" href="#scdc.event.Event.final" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>True</cite> if no further interaction can take place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.event.Event.act">
+<code class="sig-name descname">act</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.event.Event.act" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the interaction and generate a final state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.event.Event.chain">
+<code class="sig-name descname">chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.event.Event.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the interaction and run particle interactions recursively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.event.Event.leaf_events">
+<em class="property">property </em><code class="sig-name descname">leaf_events</code><a class="headerlink" href="#scdc.event.Event.leaf_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>final events in the detector.</p>
+<p>These are the leaves of the event tree, corresponding to the final
+states that will be measured.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#scdc.event.Event" title="scdc.event.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.event.Event.leaf_particles">
+<em class="property">property </em><code class="sig-name descname">leaf_particles</code><a class="headerlink" href="#scdc.event.Event.leaf_particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>final particles after relaxation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scdc.particle">
+<span id="particle-objects"></span><h2>Particle objects<a class="headerlink" href="#module-scdc.particle" title="Permalink to this headline">¶</a></h2>
+<p>This module defines the different types of (quasi)particle.</p>
+<dl class="py class">
+<dt id="scdc.particle.DarkMatter">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.particle.</code><code class="sig-name descname">DarkMatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.DarkMatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dark matter particle.</p>
+<dl class="py method">
+<dt id="scdc.particle.DarkMatter.dispersion">
+<code class="sig-name descname">dispersion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.DarkMatter.dispersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispersion relation for dark matter.</p>
+<p>Be careful: there is a need for conversion to the material’s own
+canonical units. (NOT currently implemented.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>float</em>) – momentum in who-knows-what units…to fix.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dark matter energy in units of Delta.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.particle.Particle">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.particle.</code><code class="sig-name descname">Particle</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a single phonon or quasiparticle with a tree of children.</p>
+<p><cite>momentum</cite> must be specified unless <cite>dispersion_inverse</cite> is defined, in
+which case either <cite>momentum</cite> or <cite>energy</cite> can be specified.</p>
+<p>All quantities are specified in material units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy</strong> (<em>float</em><em>, </em><em>optional</em>) – energy in units of Delta.</p></li>
+<li><p><strong>momentum</strong> (<em>float</em><em>, </em><em>optional</em>) – momentum in canonical units.</p></li>
+<li><p><strong>cos_theta</strong> (<em>float</em>) – cosine of angle wrt global z.</p></li>
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – material properties.</p></li>
+<li><p><strong>pid</strong> (<em>object</em><em>, </em><em>optional</em>) – optional ID label. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>optional</em>) – tolerance for <span class="math notranslate nohighlight">\(\cos\theta &gt; 1\)</span>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">1e-2</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.energy">
+<code class="sig-name descname">energy</code><a class="headerlink" href="#scdc.particle.Particle.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>energy in units of Delta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.momentum">
+<code class="sig-name descname">momentum</code><a class="headerlink" href="#scdc.particle.Particle.momentum" title="Permalink to this definition">¶</a></dt>
+<dd><p>momentum in canonical units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.cos_theta">
+<code class="sig-name descname">cos_theta</code><a class="headerlink" href="#scdc.particle.Particle.cos_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>cosine of angle wrt global z.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.material">
+<code class="sig-name descname">material</code><a class="headerlink" href="#scdc.particle.Particle.material" title="Permalink to this definition">¶</a></dt>
+<dd><p>material properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.pid">
+<code class="sig-name descname">pid</code><a class="headerlink" href="#scdc.particle.Particle.pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>optional ID label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.tolerance">
+<code class="sig-name descname">tolerance</code><a class="headerlink" href="#scdc.particle.Particle.tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>tolerance for <span class="math notranslate nohighlight">\(\cos\theta &gt; 1\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.parent">
+<code class="sig-name descname">parent</code><a class="headerlink" href="#scdc.particle.Particle.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>parent particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.Particle" title="scdc.particle.Particle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.origin">
+<code class="sig-name descname">origin</code><a class="headerlink" href="#scdc.particle.Particle.origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>the originating <cite>Event</cite> for this particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.dest">
+<code class="sig-name descname">dest</code><a class="headerlink" href="#scdc.particle.Particle.dest" title="Permalink to this definition">¶</a></dt>
+<dd><p>the destination <cite>Event</cite> for this particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.Particle.shortname">
+<code class="sig-name descname">shortname</code><a class="headerlink" href="#scdc.particle.Particle.shortname" title="Permalink to this definition">¶</a></dt>
+<dd><p>a short label for this particle type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.Particle.dispersion">
+<code class="sig-name descname">dispersion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Particle.dispersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disperion relation: wavenumber to energy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.Particle.dispersion_inverse">
+<code class="sig-name descname">dispersion_inverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Particle.dispersion_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse dispersion relation: energy to wavenumber.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id0">
+<em class="property">property </em><code class="sig-name descname">energy</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>energy in units of Delta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<em class="property">property </em><code class="sig-name descname">momentum</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>momentum in material units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.particle.ParticleCollection">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.particle.</code><code class="sig-name descname">ParticleCollection</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.ParticleCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a collection of particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>particles</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#scdc.particle.Particle" title="scdc.particle.Particle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></a>) – particles.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.particle.ParticleCollection.particles">
+<code class="sig-name descname">particles</code><a class="headerlink" href="#scdc.particle.ParticleCollection.particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#scdc.particle.Particle" title="scdc.particle.Particle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.ParticleCollection.energy">
+<code class="sig-name descname">energy</code><a class="headerlink" href="#scdc.particle.ParticleCollection.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>energy of each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.ParticleCollection.momentum">
+<code class="sig-name descname">momentum</code><a class="headerlink" href="#scdc.particle.ParticleCollection.momentum" title="Permalink to this definition">¶</a></dt>
+<dd><p>momentum of each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.particle.ParticleCollection.cos_theta">
+<code class="sig-name descname">cos_theta</code><a class="headerlink" href="#scdc.particle.ParticleCollection.cos_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>cos_theta of each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id2">
+<em class="property">property </em><code class="sig-name descname">cos_theta</code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of particle <cite>cos_theta</cite> values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.dm">
+<em class="property">property </em><code class="sig-name descname">dm</code><a class="headerlink" href="#scdc.particle.ParticleCollection.dm" title="Permalink to this definition">¶</a></dt>
+<dd><p>subcollection of DM particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.ParticleCollection" title="scdc.particle.ParticleCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParticleCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id3">
+<em class="property">property </em><code class="sig-name descname">energy</code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of particle energies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.from_npy">
+<em class="property">classmethod </em><code class="sig-name descname">from_npy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">npy</span></em>, <em class="sig-param"><span class="n">material</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.ParticleCollection.from_npy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a <cite>ParticleCollection</cite> from the numpy representation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>npy</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – a structured array with columns as specified
+in the <cite>to_npy</cite> method.</p></li>
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – the material to associate with these
+particles. The material is not stored in the numpy format.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a corresponding <cite>ParticleCollection</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.ParticleCollection" title="scdc.particle.ParticleCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParticleCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id4">
+<em class="property">property </em><code class="sig-name descname">momentum</code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of particle energies.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.nondark">
+<em class="property">property </em><code class="sig-name descname">nondark</code><a class="headerlink" href="#scdc.particle.ParticleCollection.nondark" title="Permalink to this definition">¶</a></dt>
+<dd><p>subcollection of non-DM particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.ParticleCollection" title="scdc.particle.ParticleCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParticleCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.phonons">
+<em class="property">property </em><code class="sig-name descname">phonons</code><a class="headerlink" href="#scdc.particle.ParticleCollection.phonons" title="Permalink to this definition">¶</a></dt>
+<dd><p>subcollection of phonons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.ParticleCollection" title="scdc.particle.ParticleCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParticleCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.quasiparticles">
+<em class="property">property </em><code class="sig-name descname">quasiparticles</code><a class="headerlink" href="#scdc.particle.ParticleCollection.quasiparticles" title="Permalink to this definition">¶</a></dt>
+<dd><p>subcollection of quasiparticles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.ParticleCollection" title="scdc.particle.ParticleCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParticleCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.select">
+<code class="sig-name descname">select</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">test</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.ParticleCollection.select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a subset of particles which satisfy a test.</p>
+<p>The argument <cite>test</cite> is a function with call signature</p>
+<blockquote>
+<div><p><cite>test(parent, particle)</cite></p>
+</div></blockquote>
+<p>which returns <cite>True</cite> if the leaf <cite>particle</cite> in the chain arising from
+the initial particle <cite>parent</cite> satisifes the test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>test</strong> (<em>function</em>) – the test function.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>collection consisting of particles which</dt><dd><p>satisfy the test.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.particle.ParticleCollection" title="scdc.particle.ParticleCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ParticleCollection</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.ParticleCollection.to_npy">
+<code class="sig-name descname">to_npy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.ParticleCollection.to_npy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent this particle collection in numpy format for export.</p>
+<p>The numpy format is a structured array with the following columns:</p>
+<blockquote>
+<div><p>shortname    momentum    cos_theta</p>
+</div></blockquote>
+<p>The numpy form REQUIRES momenta for all particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the array form of this collection.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.particle.Phonon">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.particle.</code><code class="sig-name descname">Phonon</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Phonon" title="Permalink to this definition">¶</a></dt>
+<dd><p>A phonon.</p>
+<dl class="py method">
+<dt id="scdc.particle.Phonon.dispersion">
+<code class="sig-name descname">dispersion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Phonon.dispersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispersion relation for phonons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>float</em>) – wavenumber in material units.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>phonon energy in material units.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.Phonon.dispersion_inverse">
+<code class="sig-name descname">dispersion_inverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Phonon.dispersion_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse dispersion relation for phonons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>E</strong> (<em>float</em>) – phonon energy in material units.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>phonon wavenumber in material units.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.particle.Quasiparticle">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.particle.</code><code class="sig-name descname">Quasiparticle</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Quasiparticle" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Bogoliubov quasiparticle.</p>
+<dl class="py method">
+<dt id="scdc.particle.Quasiparticle.dispersion">
+<code class="sig-name descname">dispersion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Quasiparticle.dispersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispersion relation for quasiparticles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>float</em>) – wavenumber in material units.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>quasiparticle energy in material units.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.Quasiparticle.dispersion_inverse">
+<code class="sig-name descname">dispersion_inverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.particle.Quasiparticle.dispersion_inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse dispersion relation for quasiparticles.</p>
+<p>Warning: the dispersion relation is not actually invertible. There are
+two possible choices of a sign. If the sign <cite>s</cite> is not specified, this
+method selects it randomly!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>E</strong> (<em>float</em>) – quasiparticle energy in material units.</p></li>
+<li><p><strong>s</strong> (<em>int</em><em>, </em><em>optional</em>) – sign in the momentum solution.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>quasiparticle wavenumber in material units.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.particle.Quasiparticle.ksign">
+<em class="property">property </em><code class="sig-name descname">ksign</code><a class="headerlink" href="#scdc.particle.Quasiparticle.ksign" title="Permalink to this definition">¶</a></dt>
+<dd><p>the sign as determined from energy and momentum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scdc.interaction">
+<span id="interaction-objects"></span><h2>Interaction objects<a class="headerlink" href="#module-scdc.interaction" title="Permalink to this headline">¶</a></h2>
+<p>This module defines the <a class="reference internal" href="#scdc.interaction.Interaction" title="scdc.interaction.Interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interaction</span></code></a> class and subclasses.</p>
+<p>This is where most of the action lives. Particles propagate from interaction
+to interaction, and the interaction objects determine the final states that
+arise at each point. The differential rates, for instance, are used here.</p>
+<dl class="py class">
+<dt id="scdc.interaction.DarkMatterScatter">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interaction.</code><code class="sig-name descname">DarkMatterScatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.DarkMatterScatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents an interaction in which DM scatters and creates two QPs.</p>
+<p>This is a container, in the sense that no DM dynamics are actually
+contained here. Rather, at initialization, two quasiparticles must be
+supplied in the final state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qp1</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Quasiparticle</span></code>) – final state quasiparticle 1.</p></li>
+<li><p><strong>qp2</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Quasiparticle</span></code>) – final state quasiparticle 2.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="scdc.interaction.DarkMatterScatter.allowed">
+<code class="sig-name descname">allowed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.DarkMatterScatter.allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether the process is allowed for this initial state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if the process can occur. Otherwise <cite>False</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.interaction.Interaction">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interaction.</code><code class="sig-name descname">Interaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_state</span></em>, <em class="sig-param"><span class="n">material</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.Interaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent class for interactions.</p>
+<p>An interaction combines an initial state, a material, and a final state.
+Subclasses must provide the means to go from the initial state to the final
+state.</p>
+<p>Interactions are inherently treelike and can be treated as such. The
+complication is that the initial and final states are <cite>Particle</cite> objects,
+not <cite>Interaction</cite> objects. This necessitates the introduction of a new
+container type, <cite>InteractionNode</cite>, which specifies a particle and
+the interaction in which it participates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>) – particles in the
+initial state. The initial state is always a list, even if it
+contains only one object.</p></li>
+<li><p><strong>(</strong><strong>obj</strong> (<em>material</em>) – <cite>Material</cite>): the material in which this takes place.</p></li>
+<li><p><strong>n_bins</strong> (<em>int</em><em>, </em><em>optional</em>) – number of bins to use for certain discretized
+calculations. Defaults to 100.</p></li>
+<li><p><strong>final_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>, optional) – particles in
+the final state. If supplied, the interaction is treated as trivial
+and the final state is never overwritten.</p></li>
+<li><p><strong>final</strong> (<em>bool</em><em>, </em><em>optional</em>) – if <cite>True</cite>, the interaction is treated as
+trivial and the final state is left unpopulated and unvalidated.
+Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.initial_state">
+<code class="sig-name descname">initial_state</code><a class="headerlink" href="#scdc.interaction.Interaction.initial_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>particles in the
+initial state. The initial state is always a list, even if it
+contains only one object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">material (obj</code></dt>
+<dd><p><cite>Material</cite>): the material in which this takes place.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.final">
+<code class="sig-name descname">final</code><a class="headerlink" href="#scdc.interaction.Interaction.final" title="Permalink to this definition">¶</a></dt>
+<dd><p>if <cite>True</cite>, the interaction is treated as
+trivial and the final state is left unpopulated and unvalidated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.n_initial">
+<code class="sig-name descname">n_initial</code><a class="headerlink" href="#scdc.interaction.Interaction.n_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>how many particles should be in the initial state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.n_final">
+<code class="sig-name descname">n_final</code><a class="headerlink" href="#scdc.interaction.Interaction.n_final" title="Permalink to this definition">¶</a></dt>
+<dd><p>how many particles should be in the final state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.initial">
+<code class="sig-name descname">initial</code><a class="headerlink" href="#scdc.interaction.Interaction.initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>types of the initial particles,
+listed in order of their appearance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> of <cite>type</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id5">
+<code class="sig-name descname">final</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dd><p>types of the final particles, listed in
+order of their appearance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> of <cite>type</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.ip">
+<code class="sig-name descname">ip</code><a class="headerlink" href="#scdc.interaction.Interaction.ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>first of the initial particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interaction.Interaction.fixed_final_state">
+<code class="sig-name descname">fixed_final_state</code><a class="headerlink" href="#scdc.interaction.Interaction.fixed_final_state" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>True</cite> if the final state was supplied at
+initialization. In this case, the interaction is treated as trivial
+and the final state is never overwritten.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.Interaction.allowed">
+<code class="sig-name descname">allowed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.Interaction.allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether the process is allowed for this initial state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if the process can occur. Otherwise <cite>False</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.Interaction.interact">
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.Interaction.interact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interact, validate outcome, and set final state.</p>
+<p>If the final state was supplied at initialization, do nothing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the final state.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.Interaction.valid_initial">
+<em class="property">classmethod </em><code class="sig-name descname">valid_initial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.Interaction.valid_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that an initial state contains the correct particle types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>initial_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>) – candidate initial
+state to validate.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt><cite>True</cite> if the supplied initial state has the right particle</dt><dd><p>types for this interaction. Otherwise <cite>False</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.interaction.PhononDecayToQuasiparticles">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interaction.</code><code class="sig-name descname">PhononDecayToQuasiparticles</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.PhononDecayToQuasiparticles" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <cite>Interaction</cite> for a phonon to decay to two quasiparticles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>optional</em>) – a numerical tolerance for root-finding.
+Defaults to 1e-3.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.interaction.PhononDecayToQuasiparticles.tolerance">
+<code class="sig-name descname">tolerance</code><a class="headerlink" href="#scdc.interaction.PhononDecayToQuasiparticles.tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>a numerical tolerance for root-finding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.PhononDecayToQuasiparticles.allowed">
+<code class="sig-name descname">allowed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.PhononDecayToQuasiparticles.allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether the process is allowed.</p>
+<p>Phonon decay can always take place if the energy of the phonon is at
+least 2*Delta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if phonon decay can occur. Otherwise <cite>False</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.PhononDecayToQuasiparticles.decay_angles">
+<code class="sig-name descname">decay_angles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Eqp1</span></em>, <em class="sig-param"><span class="n">Eqp2</span></em>, <em class="sig-param"><span class="n">s1</span></em>, <em class="sig-param"><span class="n">s2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.PhononDecayToQuasiparticles.decay_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the relative angles of two QPs created in phonon decay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Eqp1</strong> (<em>float</em>) – energy of quasiparticle 1.</p></li>
+<li><p><strong>Eqp2</strong> (<em>float</em>) – energy of quasiparticle 2.</p></li>
+<li><p><strong>s1</strong> (<em>int</em>) – sign appearing in the inverse dispersion relation (QP1).</p></li>
+<li><p><strong>s2</strong> (<em>int</em>) – sign appearing in the inverse dispersion relation (QP2).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>relative cos(theta) of quasiparticle 1.
+float: relative cos(theta) of quasiparticle 2.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.PhononDecayToQuasiparticles.qp_energy_distribution">
+<code class="sig-name descname">qp_energy_distribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">1e-10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.PhononDecayToQuasiparticles.qp_energy_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relative probability for a quasiparticle energy in phonon decay.</p>
+<p>This is basically the integrand of eq. (27) of Kaplan+ 1976.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>eps</strong> (<em>float</em><em>, </em><em>optional</em>) – slight offset to prevent divide-by-zero
+errors. Defaults to 1e-10.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>QP energy bin centers.
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>: relative rate for each bin center,</p>
+<blockquote>
+<div><p>normalized to unity.</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.interaction.QuasiparticlePhononEmission">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interaction.</code><code class="sig-name descname">QuasiparticlePhononEmission</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <cite>Interaction</cite> for a quasiparticle to emit a phonon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>optional</em>) – a numerical tolerance for root-finding.
+Defaults to 1e-3.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.interaction.QuasiparticlePhononEmission.tolerance">
+<code class="sig-name descname">tolerance</code><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission.tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>a numerical tolerance for root-finding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.QuasiparticlePhononEmission.allowed">
+<code class="sig-name descname">allowed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exact</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission.allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether the process is allowed for this initial state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if the process can occur. Otherwise <cite>False</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.QuasiparticlePhononEmission.final_state_angles">
+<code class="sig-name descname">final_state_angles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phonon_energy</span></em>, <em class="sig-param"><span class="n">sp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission.final_state_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cosine of angle of final state particles after QP scattering.</p>
+<p>Both angles are computed relative to the direction of the proximal
+quasiparticle just before scattering, not necessarily the initial
+quasiparticle.</p>
+<p>DEBUGGING NOTE: this follows section “Better” of <cite>dispersion.nb</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phonon_energy</strong> (<em>float</em>) – phonon energy in units of Delta.</p></li>
+<li><p><strong>qp_energy</strong> (<em>float</em>) – Initial quasiparticle energy in units of Delta.</p></li>
+<li><p><strong>sp</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of int) – momentum sign for final quasiparticle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cosine of the angle of the emitted quasiparticle.
+float: cosine of the angle of the emitted phonon.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.QuasiparticlePhononEmission.min_cos_deflection">
+<code class="sig-name descname">min_cos_deflection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission.min_cos_deflection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Max angular deflection, expressed as minimum of cos(theta).</p>
+<p>For a given QP energy, there is a maximum amount of momentum it can
+shed via phonon emission. This produces an upper bound on the angular
+deflection of the QP. We express this in the form of a lower bound on
+the cosine of the deflection angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>min of cos(theta).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.QuasiparticlePhononEmission.phonon_energy_distribution">
+<code class="sig-name descname">phonon_energy_distribution</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission.phonon_energy_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relative phonon emission probability by a quasiparticle.</p>
+<p>Computation follows dGamma/dx in eq. (21) of Noah’s note. We normalize
+directly. If the distribution cannot be normalized (all values vanish),
+both return values are <cite>None</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>phonon energy bin centers.
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>: relative rate for each bin center,</p>
+<blockquote>
+<div><p>normalized to unity.</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>NonPhysicalException</strong> – If the max phonon energy is not positive.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interaction.QuasiparticlePhononEmission.phonon_energy_region">
+<code class="sig-name descname">phonon_energy_region</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interaction.QuasiparticlePhononEmission.phonon_energy_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Min / max allowed phonon energy for emission by a quasiparticle.</p>
+<p>The min and max energies are determined by finding the energy range
+in which the final-state angles are physical, i.e.</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(|\cos(\theta)| &lt; 1\)</span>.</p>
+</div></blockquote>
+<p>This needs to be done for both the quasiparticle and phonon angle.
+Moreover, since there is a sign ambiguity in the quasiparticle
+momentum, this needs to be done for each sign independently to get
+self-consistent regions that work for both the quasiparticle angle and
+the phonon angle.</p>
+<p>Thus, we take the following approach. For each sign in turn, we find
+the physical region for each of the two angles. The intersection of
+these two regions is what we want. But then we have to do this for each
+sign, and take the union of the resulting intersections.</p>
+<p>In principle, this may be disjoint. For the moment, rather than
+significantly change the architecture of the code, I will simply throw
+an error if the regions are disjoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>qp_energy</strong> (<em>float</em>) – Initial quasiparticle energy in units of Delta.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>minimum emitted phonon energy in units of Delta.
+float: maximum emitted phonon energy in units of Delta.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-scdc.material">
+<span id="material-objects"></span><h2>Material objects<a class="headerlink" href="#module-scdc.material" title="Permalink to this headline">¶</a></h2>
+<p>This module defines a <cite>Material</cite> class.</p>
+<p>A note on units: at various places in the code, it is useful to have work with
+non-dimensionalized quantities. However, picking these quantities requires
+some care, because there are two sets of scales: those associated with
+behavior near and far from the gap. We are mainly interested in near-gap
+behavior, so we use the half-gap Delta as the energy scale. Now, excitations
+with energy Delta have momentum k_F, so it makes sense to take k_F as our
+preferred momentum scale. So far we have</p>
+<blockquote>
+<div><p>Delta = k_F = 1.</p>
+</div></blockquote>
+<p>Having made this choice, we automatically obtain a velocity v_m and a mass m_m
+as follows:</p>
+<blockquote>
+<div><p>v_m = Delta/k_F = 1,
+m_m = k_F/v_m = k_F^2/Delta = 1.</p>
+</div></blockquote>
+<p>These parameters do NOT correspond to obvious scales in the material. In
+particular, v_m is distinct from the sound speed c_s, and m_m is distinct from
+the carrier mass m_star. In other words, c_s_m != 1 and m_star_m != 1.</p>
+<p>We still need to be able to express a unit of length in order to put hbar into
+these units. So far, however, time and length always appear in ratio. It
+seems, then, that the natural thing to do is to simply set</p>
+<blockquote>
+<div><p>hbar = 1.</p>
+</div></blockquote>
+<p>The natural units of time and length are then</p>
+<blockquote>
+<div><p>t_m = hbar/Delta = 1,
+l_m = hbar/Delta*v_m = hbar*k_F/Delta^2 = 1.</p>
+</div></blockquote>
+<p>It is useful to distinguish quantities in ordinary units from those in
+material units. To that end, we will append “_m” to the names of quantities
+that are defined in material units.</p>
+<p>For uniformity, ALL quantities not in material units are assumed to be in
+units of an appropriate power of eV with c=hbar=kB=1.</p>
+<dl class="py class">
+<dt id="scdc.material.Material">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.material.</code><code class="sig-name descname">Material</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.material.Material" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container class for material properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<em>str</em>) – chemical symbol.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – gamma parameter.</p></li>
+<li><p><strong>c_s</strong> (<em>float</em>) – speed of sound in m/s.</p></li>
+<li><p><strong>T_c</strong> (<em>float</em>) – critical temperature in K.</p></li>
+<li><p><strong>Delta</strong> (<em>float</em>) – half of the gap in eV.</p></li>
+<li><p><strong>E_F</strong> (<em>float</em>) – Fermi energy in eV.</p></li>
+<li><p><strong>m_star</strong> (<em>float</em>) – effective mass? in units of m_e.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – beta.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.material.Material.symbol">
+<code class="sig-name descname">symbol</code><a class="headerlink" href="#scdc.material.Material.symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>chemical symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.gamma">
+<code class="sig-name descname">gamma</code><a class="headerlink" href="#scdc.material.Material.gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>gamma parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.c_s">
+<code class="sig-name descname">c_s</code><a class="headerlink" href="#scdc.material.Material.c_s" title="Permalink to this definition">¶</a></dt>
+<dd><p>speed of sound in m/s.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.T_c">
+<code class="sig-name descname">T_c</code><a class="headerlink" href="#scdc.material.Material.T_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>critical temperature in K.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.Delta">
+<code class="sig-name descname">Delta</code><a class="headerlink" href="#scdc.material.Material.Delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>half of the gap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.E_F">
+<code class="sig-name descname">E_F</code><a class="headerlink" href="#scdc.material.Material.E_F" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fermi energy in eV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.m_star">
+<code class="sig-name descname">m_star</code><a class="headerlink" href="#scdc.material.Material.m_star" title="Permalink to this definition">¶</a></dt>
+<dd><p>effective mass? in units of m_e.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.z">
+<code class="sig-name descname">z</code><a class="headerlink" href="#scdc.material.Material.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fermi energy in units of Delta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.beta">
+<code class="sig-name descname">beta</code><a class="headerlink" href="#scdc.material.Material.beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>beta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.material.Material.mcs2">
+<code class="sig-name descname">mcs2</code><a class="headerlink" href="#scdc.material.Material.mcs2" title="Permalink to this definition">¶</a></dt>
+<dd><p>m*c_s^2 in units of eV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.material.Material.coherence_uvvu">
+<code class="sig-name descname">coherence_uvvu</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">k1</span></em>, <em class="sig-param"><span class="n">k2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.material.Material.coherence_uvvu" title="Permalink to this definition">¶</a></dt>
+<dd><p>The coherence factor (uv’ +/- vu’)^2. The sign is <cite>s</cite>.</p>
+<p>Note that <cite>k1</cite> and <cite>k2</cite> are assumed to be in material units (i.e. in
+units of k_F).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>int</em>) – sign that appears in the coherence factor (1 or -1).</p></li>
+<li><p><strong>k1</strong> (<em>float</em>) – momentum of quasiparticle 1 in material units.</p></li>
+<li><p><strong>k2</strong> (<em>float</em>) – momentum of quasiparticle 2 in material units.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the coherence factor (uv’ +/- vu’)^2.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.material.Material.epsilon_lindhard">
+<code class="sig-name descname">epsilon_lindhard</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">omega</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.material.Material.epsilon_lindhard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lindhard dielectric function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.material.Material.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.material.Material.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Material data in a json-serializable format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>material info.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.material.Material.qpe">
+<code class="sig-name descname">qpe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.material.Material.qpe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the energy of a quasiparticle of momentum <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<p>This is a convenience method that is identical to the <code class="docutils literal notranslate"><span class="pre">Quasiparticle</span></code>
+dispersion relation. In fact, the two might be merged later on…</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>k</strong> – QP momentum</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>QP energy in material units</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Structure of the code</a><ul>
+<li><a class="reference internal" href="#module-scdc.event">Events and down-conversion</a></li>
+<li><a class="reference internal" href="#module-scdc.particle">Particle objects</a></li>
+<li><a class="reference internal" href="#module-scdc.interaction">Interaction objects</a></li>
+<li><a class="reference internal" href="#module-scdc.material">Material objects</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="kinematics.html"
+                        title="previous chapter">Kinematics</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="analysis.html"
+                        title="next chapter">Analysis tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/code_structure.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Analysis tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="kinematics.html" title="Kinematics"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Structure of the code</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, the authors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.0.
+    </div>
+  </body>
+</html>

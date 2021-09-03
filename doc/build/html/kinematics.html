@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinematics &#8212; scdc 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Structure of the code" href="code_structure.html" />
+    <link rel="prev" title="Welcome to scdc’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="code_structure.html" title="Structure of the code"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to scdc’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Kinematics</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kinematics">
+<h1>Kinematics<a class="headerlink" href="#kinematics" title="Permalink to this headline">¶</a></h1>
+<p>We now review the kinematics of phonons and quasiparticles as treated by the code. Note that we work in the “clean” limit, where crystal momentum is conserved.</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="units">
+<h2>Units<a class="headerlink" href="#units" title="Permalink to this headline">¶</a></h2>
+<p>In the code, we work in “material” units, setting <span class="math notranslate nohighlight">\(v_\ell = k_F = \Delta = 1\)</span>. This implies that <span class="math notranslate nohighlight">\(\hbar = 2\gamma\sqrt z\)</span>, where <span class="math notranslate nohighlight">\(z\equiv E_F/\Delta\)</span>.</p>
+</div>
+<div class="section" id="dispersion-relations">
+<h2>Dispersion relations<a class="headerlink" href="#dispersion-relations" title="Permalink to this headline">¶</a></h2>
+<p>The phonon dispersion relation is <span class="math notranslate nohighlight">\(E=\hbar q\)</span>. This is invertible: a phonon’s energy uniquely determines its momentum. The same is not true for a quasiparticle, which has dispersion relation</p>
+<div class="math notranslate nohighlight">
+\[E = \left[1 + \left(\frac{\hbar^2 k^2}{2m_e} - z\right)^2\right]^{1/2}.\]</div>
+<p>The inverse is requires a choice of sign:</p>
+<div class="math notranslate nohighlight">
+\[k = \frac{1}{\hbar}\left[
+        2m_e\left(
+            z \pm\sqrt{E^2 - 1}
+        \right)
+    \right]^{1/2}.\]</div>
+<p>This corresponds to the fact that the energy is minimized (<span class="math notranslate nohighlight">\(E=\Delta\)</span>) at the Fermi surface, <span class="math notranslate nohighlight">\(k=k_F\)</span>, and increases in either direction. In the code, <em>if a quasiparticle is instantiated with only energy specified, we choose this sign randomly.</em></p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Kinematics</a><ul>
+<li><a class="reference internal" href="#units">Units</a></li>
+<li><a class="reference internal" href="#dispersion-relations">Dispersion relations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to scdc’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="code_structure.html"
+                        title="next chapter">Structure of the code</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/kinematics.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="code_structure.html" title="Structure of the code"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to scdc’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Kinematics</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, the authors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.0.
+    </div>
+  </body>
+</html>

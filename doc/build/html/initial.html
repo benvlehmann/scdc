@@ -1,0 +1,1098 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Initial distribution &#8212; scdc 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using the code" href="using.html" />
+    <link rel="prev" title="Analysis tools" href="analysis.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using.html" title="Using the code"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Analysis tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Initial distribution</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="initial-distribution">
+<h1>Initial distribution<a class="headerlink" href="#initial-distribution" title="Permalink to this headline">¶</a></h1>
+<p>When studying the directionality of excitations produced in dark matter scattering, down-conversion is only the second part of the calculation. The first, of course, is to sample the initial excitations in the first place!</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">initial</span></code> module provides tools to do exactly that, all the way from a halo velocity distribution to a material response function to an ensemble of initial excitations.</p>
+<div class="section" id="dark-matter-distribution">
+<h2>Dark matter distribution<a class="headerlink" href="#dark-matter-distribution" title="Permalink to this headline">¶</a></h2>
+<p>Before we can sample the initial excitations, we need to define the dark matter velocity distribution (speed and direction). A parent class for such distributions is provided in the <code class="docutils literal notranslate"><span class="pre">halo</span></code> module, and several important cases are implemented as subclasses.</p>
+<div class="section" id="module-scdc.initial.halo">
+<span id="halo-module"></span><h3><code class="docutils literal notranslate"><span class="pre">halo</span></code> module<a class="headerlink" href="#module-scdc.initial.halo" title="Permalink to this headline">¶</a></h3>
+<p>This module defines forms of the DM halo velocity distribution.</p>
+<dl class="py class">
+<dt id="scdc.initial.halo.IsotropicDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.halo.</code><code class="sig-name descname">IsotropicDistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.IsotropicDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Speed distribution of the Standard Halo Model with isotropic DM.</p>
+<p>This is not a realistic distribution. It is meant to represent a null
+hypothesis in which the speed distribution is exactly the same as the
+Standard Halo Model, but the direction is isotropic. This is needed for
+comparative purposes to statistically assess directional reach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_esc</strong> (<em>float</em>) – the escape velocity of the halo.</p></li>
+<li><p><strong>v_0</strong> (<em>float</em>) – the rms velocity of the halo.</p></li>
+<li><p><strong>v_wind</strong> (<em>float</em>) – lab (Earth) velocity in the halo frame.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.halo.IsotropicDistribution.shm">
+<code class="sig-name descname">shm</code><a class="headerlink" href="#scdc.initial.halo.IsotropicDistribution.shm" title="Permalink to this definition">¶</a></dt>
+<dd><p>the corresponding Standard Halo
+Distribution object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#scdc.initial.halo.StandardHaloDistribution" title="scdc.initial.halo.StandardHaloDistribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StandardHaloDistribution</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.halo.IsotropicDistribution.c1_marginal">
+<code class="sig-name descname">c1_marginal</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.IsotropicDistribution.c1_marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalarize in the first argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.halo.IsotropicDistribution.v1_marginal">
+<code class="sig-name descname">v1_marginal</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.IsotropicDistribution.v1_marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalarize in the first argument.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.halo.SingleVelocityDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.halo.</code><code class="sig-name descname">SingleVelocityDistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.SingleVelocityDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a velocity distribution with one speed in one direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>speed</strong> (<em>float</em>) – the fixed speed.</p></li>
+<li><p><strong>cos_theta</strong> (<em>float</em><em>, </em><em>optional</em>) – the direction, given as cos(theta) in the
+laboratory coordinate system. Defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.halo.SingleVelocityDistribution.speed">
+<code class="sig-name descname">speed</code><a class="headerlink" href="#scdc.initial.halo.SingleVelocityDistribution.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>the fixed speed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.SingleVelocityDistribution.cos_theta">
+<code class="sig-name descname">cos_theta</code><a class="headerlink" href="#scdc.initial.halo.SingleVelocityDistribution.cos_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>the direction, given as cos(theta) in the
+laboratory coordinate system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.halo.SingleVelocityDistribution.c1_marginal">
+<code class="sig-name descname">c1_marginal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">c1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.SingleVelocityDistribution.c1_marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marginal distribution of <code class="docutils literal notranslate"><span class="pre">c1</span></code>.</p>
+<p>For this artificial distribution, it is possible to write the marginal
+distribution explicitly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>c1</strong> (<em>float</em>) – <code class="docutils literal notranslate"><span class="pre">c1</span></code> value.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>probability density.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.halo.SingleVelocityDistribution.v1_marginal">
+<code class="sig-name descname">v1_marginal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.SingleVelocityDistribution.v1_marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marginal distribution of <code class="docutils literal notranslate"><span class="pre">v1</span></code>.</p>
+<p>For this artificial distribution, it is possible to write the marginal
+distribution explicitly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v1</strong> (<em>float</em>) – <code class="docutils literal notranslate"><span class="pre">v1</span></code> value.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>probability density.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.halo.StandardHaloDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.halo.</code><code class="sig-name descname">StandardHaloDistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents the Standard Halo Model distribution in the lab frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_esc</strong> (<em>float</em>) – the escape velocity of the halo.</p></li>
+<li><p><strong>v_0</strong> (<em>float</em>) – the rms velocity of the halo.</p></li>
+<li><p><strong>v_wind</strong> (<em>float</em>) – lab (Earth) velocity in the halo frame.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.halo.StandardHaloDistribution.v_esc">
+<code class="sig-name descname">v_esc</code><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistribution.v_esc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the escape velocity of the halo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.StandardHaloDistribution.v_0">
+<code class="sig-name descname">v_0</code><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistribution.v_0" title="Permalink to this definition">¶</a></dt>
+<dd><p>the rms velocity of the halo. (NOTE not actually rms.
+This is exp(-v^2/v_0^2). TODO.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.StandardHaloDistribution.v_wind">
+<code class="sig-name descname">v_wind</code><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistribution.v_wind" title="Permalink to this definition">¶</a></dt>
+<dd><p>lab (Earth) velocity in the halo frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.halo.StandardHaloDistributionGalFrame">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.halo.</code><code class="sig-name descname">StandardHaloDistributionGalFrame</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistributionGalFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents the Standard Halo Model distribution in the halo frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_esc</strong> (<em>float</em>) – the escape velocity of the halo.</p></li>
+<li><p><strong>v_0</strong> (<em>float</em>) – the rms velocity of the halo.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.halo.StandardHaloDistributionGalFrame.v_esc">
+<code class="sig-name descname">v_esc</code><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistributionGalFrame.v_esc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the escape velocity of the halo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.StandardHaloDistributionGalFrame.v_0">
+<code class="sig-name descname">v_0</code><a class="headerlink" href="#scdc.initial.halo.StandardHaloDistributionGalFrame.v_0" title="Permalink to this definition">¶</a></dt>
+<dd><p>the rms velocity of the halo. (NOTE not actually rms.
+This is exp(-v^2/v_0^2). TODO.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.halo.VelocityDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.halo.</code><code class="sig-name descname">VelocityDistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a generic DM velocity distribution.</p>
+<p>This is a base class for velocity distributions. Such a distribution is
+defined by a pdf in the two variables <code class="docutils literal notranslate"><span class="pre">v1</span></code> and <code class="docutils literal notranslate"><span class="pre">c1</span></code>, corresponding to
+speed and <span class="math notranslate nohighlight">\(\cos       heta\)</span> with respect to the wind axis. The pdf is to
+be implemented in <code class="docutils literal notranslate"><span class="pre">__call__</span></code>.</p>
+<p>During initialization, the pdf is sampled at a large number of points, and
+the marginal distributions of <code class="docutils literal notranslate"><span class="pre">v1</span></code> and <code class="docutils literal notranslate"><span class="pre">c1</span></code> are constructed from
+interpolation of those samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_c1</strong> (<em>int</em><em>, </em><em>optional</em>) – number of sample points to use in <code class="docutils literal notranslate"><span class="pre">c1</span></code> when
+building the marginal distribution. Defaults to 50.</p></li>
+<li><p><strong>n_v1</strong> (<em>int</em><em>, </em><em>optional</em>) – number of sample points to use in <code class="docutils literal notranslate"><span class="pre">v1</span></code> when
+building the marginal distribution. Defaults to 50.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.n_c1">
+<code class="sig-name descname">n_c1</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.n_c1" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of sample points used in <code class="docutils literal notranslate"><span class="pre">c1</span></code> when building the
+marginal distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.n_v1">
+<code class="sig-name descname">n_v1</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.n_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of sample points used in <code class="docutils literal notranslate"><span class="pre">v1</span></code> when building the
+marginal distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.v_min">
+<code class="sig-name descname">v_min</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.v_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>minimum velocity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.v_max">
+<code class="sig-name descname">v_max</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.v_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>maximum velocity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.c1_min">
+<code class="sig-name descname">c1_min</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.c1_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>minimum <span class="math notranslate nohighlight">\(\cos     heta\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.c1_max">
+<code class="sig-name descname">c1_max</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.c1_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>maximum <span class="math notranslate nohighlight">\(\cos     heta\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.c1_marginal_spline">
+<code class="sig-name descname">c1_marginal_spline</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.c1_marginal_spline" title="Permalink to this definition">¶</a></dt>
+<dd><p>spline interpolation of the marginal
+distribution of <code class="docutils literal notranslate"><span class="pre">c1</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.halo.VelocityDistribution.v1_marginal_spline">
+<code class="sig-name descname">v1_marginal_spline</code><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.v1_marginal_spline" title="Permalink to this definition">¶</a></dt>
+<dd><p>spline interpolation of the marginal
+distribution of <code class="docutils literal notranslate"><span class="pre">v1</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.halo.VelocityDistribution.c1_marginal">
+<code class="sig-name descname">c1_marginal</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.c1_marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalarize in the first argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.halo.VelocityDistribution.v1_marginal">
+<code class="sig-name descname">v1_marginal</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.halo.VelocityDistribution.v1_marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalarize in the first argument.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="dark-matter-interaction">
+<h2>Dark matter interaction<a class="headerlink" href="#dark-matter-interaction" title="Permalink to this headline">¶</a></h2>
+<p>Given the dark matter distribution, one still needs to supply the squared matrix element for the interaction with the electrons in the superconductor, and the material response function (i.e. the dielectric function and coherence factor). These are defined in the <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> and <code class="docutils literal notranslate"><span class="pre">response</span></code> modules, respectively.</p>
+<div class="section" id="module-scdc.initial.matrix_element">
+<span id="matrix-element-module"></span><h3><code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> module<a class="headerlink" href="#module-scdc.initial.matrix_element" title="Permalink to this headline">¶</a></h3>
+<p>This module defines matrix elements for DM scattering.</p>
+<dl class="py class">
+<dt id="scdc.initial.matrix_element.FiducialMatrixElement">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.matrix_element.</code><code class="sig-name descname">FiducialMatrixElement</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.matrix_element.FiducialMatrixElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fiducial squared matrix element for nonrelativistic DM scattering.</p>
+<p>This class represents a matrix element of the form 1/(q^2 + m_med^2)^2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mediator_mass</strong> (<em>float</em>) – mediator mass, units TBD.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.matrix_element.FiducialMatrixElement.mediator_mass">
+<code class="sig-name descname">mediator_mass</code><a class="headerlink" href="#scdc.initial.matrix_element.FiducialMatrixElement.mediator_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>mediator mass, units TBD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.matrix_element.ScatteringMatrixElement">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.matrix_element.</code><code class="sig-name descname">ScatteringMatrixElement</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.matrix_element.ScatteringMatrixElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <strong>squared</strong> matrix element for scattering.</p>
+<p>Matrix elements may accept arbitrary variables for initialization, but the
+evaluation must accept only the momentum transfer <cite>rq</cite>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scdc.initial.response">
+<span id="response-module"></span><h3><code class="docutils literal notranslate"><span class="pre">response</span></code> module<a class="headerlink" href="#module-scdc.initial.response" title="Permalink to this headline">¶</a></h3>
+<p>This module defines coherence factors for use in computing the initial
+angular distribution of excitations produced by a hard scatter.</p>
+<dl class="py class">
+<dt id="scdc.initial.response.HybridResponseFunction">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.response.</code><code class="sig-name descname">HybridResponseFunction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">material</span></em>, <em class="sig-param"><span class="n">coherence_sign</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.response.HybridResponseFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximate (BCS + Lindhard) response function.</p>
+<p>This response function approximates the numerator of the loss function,
+<span class="math notranslate nohighlight">\(\mathrm{Im}(\epsilon_{\mathrm{BCS}})\)</span>, in terms of the BCS
+coherence factor, yielding a response function of the form</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(F_{\mathrm{BCS}} / |\epsilon_{\mathrm{L}}|^2.\)</span></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – material object.</p></li>
+<li><p><strong>coherence_sign</strong> (<em>int</em>) – sign in the coherence factor (1 or -1).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.response.ResponseFunction">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.response.</code><code class="sig-name descname">ResponseFunction</code><a class="headerlink" href="#scdc.initial.response.ResponseFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for response functions.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="producing-initial-samples">
+<h2>Producing initial samples<a class="headerlink" href="#producing-initial-samples" title="Permalink to this headline">¶</a></h2>
+<p>The final step of the process is to generate actual samples given all of the above ingredients. This is performed by the <code class="docutils literal notranslate"><span class="pre">distribution</span></code> module. Previous versions of the code used different methods for this sampling problem, and the surviving method is implemented in the <code class="docutils literal notranslate"><span class="pre">integral</span></code> submodule.</p>
+<div class="section" id="module-scdc.initial.distribution.integral">
+<span id="integral-module"></span><h3><code class="docutils literal notranslate"><span class="pre">integral</span></code> module<a class="headerlink" href="#module-scdc.initial.distribution.integral" title="Permalink to this headline">¶</a></h3>
+<p>This module defines the distribution of the initial excitations in angles
+and momenta, as a function of the scattering matrix element. Unlike prior
+implementations using MCMC methods, here the sampling is carried by direct
+integration of the distribution.</p>
+<dl class="py class">
+<dt id="scdc.initial.distribution.integral.InitialSampler">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.distribution.integral.</code><code class="sig-name descname">InitialSampler</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sampler for parameter distribution of initial excitations.</p>
+<dl>
+<dt>Here’s the general strategy:</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Start by computing the total rate for each of many speeds.</dt><dd><ul class="simple">
+<li><p>Do this by computing the total rate on a sparse grid of speeds
+and interpolating.</p></li>
+<li><p>The total rate calculation at each speed requires that we
+calculate the rate at many values in the (cq, rq) plane. Store
+these values for later.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Use these together with the marginal distribution of speeds in the
+halo to sample a set of DM speeds.</p></li>
+</ol>
+<p>3. For each DM speed, interpolate the rates between different slices of
+the (cq, rq) plane, corresponding to different discrete speeds.
+This gives an interpolated set of rates in the (cq, rq) plane at
+the speed of interest.</p>
+<ol class="arabic simple" start="4">
+<li><p>Interpolate these rates to sample (cq, rq).</p></li>
+<li><dl class="simple">
+<dt>Determine two remaining kinematical variables.</dt><dd><ul class="simple">
+<li><p>The azimuthal angle of the final states with respect to the
+momentum transfer can be sampled uniformly.</p></li>
+<li><p>The angle of the incoming DM with respect to the DM wind axis
+has a well-determined marginal distribution at fixed DM speed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p>All arguments required of <code class="docutils literal notranslate"><span class="pre">RateIntegrator</span></code> are also required here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_cq</strong> (<em>int</em><em>, </em><em>optional</em>) – number of samples to take in cq. Defaults to 50.</p></li>
+<li><p><strong>n_rq</strong> (<em>int</em><em>, </em><em>optional</em>) – number of samples to take in rq. Defaults to 500.</p></li>
+<li><p><strong>n_v1</strong> (<em>int</em><em>, </em><em>optional</em>) – number of samples to take in v1. Defaults to 20.</p></li>
+<li><p><strong>n_cuts</strong> (<em>int</em><em>, </em><em>optional</em>) – number of times to adaptively change the
+domain of sampling. Defaults to 3.</p></li>
+<li><p><strong>n_spline</strong> (<em>int</em><em>, </em><em>optional</em>) – number of samples to use in interpolations.
+Defaults to 200.</p></li>
+<li><p><strong>support_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – fraction of the total rate to
+retain when shrinking the sampling domain. Defaults to 0.9999.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.n_cq">
+<code class="sig-name descname">n_cq</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.n_cq" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of samples to take in cq.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.n_rq">
+<code class="sig-name descname">n_rq</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.n_rq" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of samples to take in rq.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.n_v1">
+<code class="sig-name descname">n_v1</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.n_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of samples to take in v1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.n_cuts">
+<code class="sig-name descname">n_cuts</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.n_cuts" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of times to adaptively change the domain of
+sampling. Defaults to 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.n_spline">
+<code class="sig-name descname">n_spline</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.n_spline" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of samples to use in interpolations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.support_threshold">
+<code class="sig-name descname">support_threshold</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.support_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>fraction of the total rate to retain when
+shrinking the sampling domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.cq_vals">
+<code class="sig-name descname">cq_vals</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.cq_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>values at which cq is sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.v1_min">
+<code class="sig-name descname">v1_min</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.v1_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>minimum value of v1 compatible with scattering given
+the supplied vdf.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.v1_max">
+<code class="sig-name descname">v1_max</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.v1_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>maximum value of v1 from the vdf.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.v1_vals">
+<code class="sig-name descname">v1_vals</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.v1_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>values at which v1 is sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.r1_vals">
+<code class="sig-name descname">r1_vals</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.r1_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>momenta corresponding to <code class="docutils literal notranslate"><span class="pre">v1_vals</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.c1_vals">
+<code class="sig-name descname">c1_vals</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.c1_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>values at which c1 is sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.rate_fixed_v1_cq_rq">
+<code class="sig-name descname">rate_fixed_v1_cq_rq</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.rate_fixed_v1_cq_rq" title="Permalink to this definition">¶</a></dt>
+<dd><p>array giving the rate at fixed
+v1, cq, and rq, with shape <code class="docutils literal notranslate"><span class="pre">(n_v1,</span> <span class="pre">n_cq,</span> <span class="pre">n_rq)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.rate_fixed_v1">
+<code class="sig-name descname">rate_fixed_v1</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.rate_fixed_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>array giving the rate at fixed v1,
+with shape <code class="docutils literal notranslate"><span class="pre">(n_v1,)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.InitialSampler.rq_by_v1">
+<code class="sig-name descname">rq_by_v1</code><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.rq_by_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of values at which rq is sampled for
+each v1 value, with shape <code class="docutils literal notranslate"><span class="pre">(n_v1,</span> <span class="pre">n_rq)</span></code>. Note that the sampled
+rq values may be different for each v1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>NotAllowedException</strong> – DM mass is below threshold for scattering for all
+    available velocities.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.InitialSampler.ensemble">
+<code class="sig-name descname">ensemble</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample an ensemble of DM scatters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_samples</strong> (<em>int</em>) – number of samples to draw.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>an ensemble of <code class="xref py py-obj docutils literal notranslate"><span class="pre">DarkMatterScatter</span></code> events.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ensemble</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.InitialSampler.q_rate_grid">
+<code class="sig-name descname">q_rate_grid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">20</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.q_rate_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a grid of rates at fixed <span class="math notranslate nohighlight">\((c_q,r_q)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>float</em>) – fixed <span class="math notranslate nohighlight">\(r_1\)</span> value.</p></li>
+<li><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – fixed order to use for Gaussian quadrature.</p></li>
+<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – the fraction of the integrated rate
+that should be preserved when doing cuts. Note that cuts are
+repeated <code class="docutils literal notranslate"><span class="pre">n_cuts</span></code> times. Defaults to 0.99.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1d array of unique <span class="math notranslate nohighlight">\(c_q\)</span> values.
+ndarray: 1d array of unique <span class="math notranslate nohighlight">\(r_q\)</span> values.
+ndarray: 2d array of rate values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – if all rates are zero.</p></li>
+<li><p><strong>ValueError</strong> – if <span class="math notranslate nohighlight">\(r_1\)</span> is too small for any scattering to be
+    kinematically allowed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.InitialSampler.q_to_p">
+<code class="sig-name descname">q_to_p</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">rq</span></em>, <em class="sig-param"><span class="n">r3</span></em>, <em class="sig-param"><span class="n">c1</span></em>, <em class="sig-param"><span class="n">cq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.q_to_p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform momentum-transfer samples to get the final-state momenta.</p>
+<p>Note that this method also samples azimuthal angles for the
+quasiparticles with respect to the momentum transfer. The three input
+arrays must have the same length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>ndarray</em>) – <span class="math notranslate nohighlight">\(r_1\)</span> values.</p></li>
+<li><p><strong>rq</strong> (<em>ndarray</em>) – <span class="math notranslate nohighlight">\(r_q\)</span> values.</p></li>
+<li><p><strong>r3</strong> (<em>ndarray</em>) – <span class="math notranslate nohighlight">\(r_3\)</span> values.</p></li>
+<li><p><strong>c1</strong> (<em>ndarray</em>) – <span class="math notranslate nohighlight">\(c_1\)</span> values.</p></li>
+<li><p><strong>cq</strong> (<em>ndarray</em>) – <span class="math notranslate nohighlight">\(\cos\theta_q\)</span> values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>an array of samples of shape <code class="docutils literal notranslate"><span class="pre">(len(cq),</span> <span class="pre">4)</span></code>. These</dt><dd><p>samples have the form <span class="math notranslate nohighlight">\((r_3, r_4, c_3, c_4)\)</span>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.InitialSampler.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_samples</span></em>, <em class="sig-param"><span class="n">max_attempts</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps drawing samples until we get the desired number.</p>
+<p>This method wraps <code class="docutils literal notranslate"><span class="pre">_sample</span></code> and has identical arguments and returns,
+except for one additional argument that specifies the max number of
+attempts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_samples</strong> (<em>int</em>) – number of samples to draw.</p></li>
+<li><p><strong>max_attempts</strong> (<em>int</em>) – max number of calls to <code class="docutils literal notranslate"><span class="pre">_sample</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, never give up. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(r_1\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(r_2\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(r_3\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(r_4\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(c_1\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(c_2\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(c_3\)</span> values.
+ndarray: <span class="math notranslate nohighlight">\(c_4\)</span> values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.InitialSampler.samples_to_ensemble">
+<code class="sig-name descname">samples_to_ensemble</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">r2</span></em>, <em class="sig-param"><span class="n">r3</span></em>, <em class="sig-param"><span class="n">r4</span></em>, <em class="sig-param"><span class="n">c1</span></em>, <em class="sig-param"><span class="n">c2</span></em>, <em class="sig-param"><span class="n">c3</span></em>, <em class="sig-param"><span class="n">c4</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.InitialSampler.samples_to_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert sampled final-state momenta to an <code class="xref py py-obj docutils literal notranslate"><span class="pre">Ensemble</span></code>.</p>
+<p>All input arrays must have the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>ndarray</em>) – sampled <span class="math notranslate nohighlight">\(r_1\)</span> values.</p></li>
+<li><p><strong>r1</strong> – sampled <span class="math notranslate nohighlight">\(r_2\)</span> values.</p></li>
+<li><p><strong>r3</strong> (<em>ndarray</em>) – sampled <span class="math notranslate nohighlight">\(r_3\)</span> values.</p></li>
+<li><p><strong>r4</strong> (<em>ndarray</em>) – sampled <span class="math notranslate nohighlight">\(r_4\)</span> values.</p></li>
+<li><p><strong>c1</strong> (<em>ndarray</em>) – sampled <span class="math notranslate nohighlight">\(c_1\)</span> values.</p></li>
+<li><p><strong>c1</strong> – sampled <span class="math notranslate nohighlight">\(c_2\)</span> values.</p></li>
+<li><p><strong>c3</strong> (<em>ndarray</em>) – sampled <span class="math notranslate nohighlight">\(c_3\)</span> values.</p></li>
+<li><p><strong>c4</strong> (<em>ndarray</em>) – sampled <span class="math notranslate nohighlight">\(c_4\)</span> values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>an ensemble of <code class="xref py py-obj docutils literal notranslate"><span class="pre">DarkMatterScatter</span></code> events.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ensemble</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.initial.distribution.integral.RateIntegrator">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.initial.distribution.integral.</code><code class="sig-name descname">RateIntegrator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m1</span></em>, <em class="sig-param"><span class="n">matrix_element</span></em>, <em class="sig-param"><span class="n">material</span></em>, <em class="sig-param"><span class="n">response</span></em>, <em class="sig-param"><span class="n">vdf</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for integrating rates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m1</strong> (<em>float</em>) – mass of the incoming particle.</p></li>
+<li><p><strong>matrix_element</strong> (<em>callable</em>) – the matrix element for the scattering
+process, as a function of the magnitude of the 3-momentum transfer.
+A <code class="xref py py-obj docutils literal notranslate"><span class="pre">ScatteringMatrixElement</span></code> object can be supplied here.</p></li>
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – a material object.</p></li>
+<li><p><strong>response</strong> (<em>callable</em>) – a function of <span class="math notranslate nohighlight">\(q\)</span> and <span class="math notranslate nohighlight">\(\omega\)</span>
+characterizing material response.</p></li>
+<li><p><strong>vdf</strong> (<em>callable</em>) – a probability distribution for the velocity as a
+function of zero, one, or two parameters. The number of arguments
+must match the length of the argument <code class="docutils literal notranslate"><span class="pre">v_args</span></code> to <code class="docutils literal notranslate"><span class="pre">likelihood</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.m1">
+<code class="sig-name descname">m1</code><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.m1" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass of the incoming particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.matrix_element">
+<code class="sig-name descname">matrix_element</code><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.matrix_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>the matrix element for the scattering
+process, as a function of the magnitude of the 3-momentum transfer.
+A <code class="xref py py-obj docutils literal notranslate"><span class="pre">ScatteringMatrixElement</span></code> object can be supplied here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.material">
+<code class="sig-name descname">material</code><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.material" title="Permalink to this definition">¶</a></dt>
+<dd><p>a material object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.response">
+<code class="sig-name descname">response</code><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.response" title="Permalink to this definition">¶</a></dt>
+<dd><p>a function of <span class="math notranslate nohighlight">\(q\)</span> and <span class="math notranslate nohighlight">\(\omega\)</span>
+characterizing material response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.vdf">
+<code class="sig-name descname">vdf</code><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.vdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>a probability distribution for the velocity as a
+function of zero, one, or two parameters. The number of arguments
+must match the length of the argument <code class="docutils literal notranslate"><span class="pre">v_args</span></code> to <code class="docutils literal notranslate"><span class="pre">likelihood</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.pdf">
+<code class="sig-name descname">pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">rq</span></em>, <em class="sig-param"><span class="n">cq</span></em>, <em class="sig-param"><span class="n">r3</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the differential rate summing over sign choices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_1\)</span>.</p></li>
+<li><p><strong>rq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_q\)</span>.</p></li>
+<li><p><strong>cq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(c_q\)</span>.</p></li>
+<li><p><strong>r3</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_3\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>differential rate (non-normalized).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.pdf_fixed_sign">
+<code class="sig-name descname">pdf_fixed_sign</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">rq</span></em>, <em class="sig-param"><span class="n">cq</span></em>, <em class="sig-param"><span class="n">r3</span></em>, <em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.pdf_fixed_sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the pdf for fixed sign <span class="math notranslate nohighlight">\(s\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_1\)</span>.</p></li>
+<li><p><strong>rq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_q\)</span>.</p></li>
+<li><p><strong>cq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(c_q\)</span>.</p></li>
+<li><p><strong>r3</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_3\)</span>.</p></li>
+<li><p><strong>s</strong> (<em>float</em>) – the sign <span class="math notranslate nohighlight">\(s\)</span> selecting between the two solutions
+for the second quasiparticle’s momentum.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>differential probability.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if <span class="math notranslate nohighlight">\(r_q = 0\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.q_rate">
+<code class="sig-name descname">q_rate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">rq</span></em>, <em class="sig-param"><span class="n">cq</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.q_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrated rate at fixed <span class="math notranslate nohighlight">\(r_1\)</span> and <span class="math notranslate nohighlight">\(q\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_1\)</span>.</p></li>
+<li><p><strong>rq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_q\)</span>.</p></li>
+<li><p><strong>cq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(c_q\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>differential rate (non-normalized).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.initial.distribution.integral.RateIntegrator.r3_domain">
+<code class="sig-name descname">r3_domain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">r1</span></em>, <em class="sig-param"><span class="n">rq</span></em>, <em class="sig-param"><span class="n">cq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.initial.distribution.integral.RateIntegrator.r3_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the minimum and maximum allowed values of <span class="math notranslate nohighlight">\(r_3\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r1</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_1\)</span>.</p></li>
+<li><p><strong>rq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(r_q\)</span>.</p></li>
+<li><p><strong>cq</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(c_q\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>lower bound on <span class="math notranslate nohighlight">\(r_3\)</span>.
+float: upper bound on <span class="math notranslate nohighlight">\(r_3\)</span>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Initial distribution</a><ul>
+<li><a class="reference internal" href="#dark-matter-distribution">Dark matter distribution</a><ul>
+<li><a class="reference internal" href="#module-scdc.initial.halo"><code class="docutils literal notranslate"><span class="pre">halo</span></code> module</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dark-matter-interaction">Dark matter interaction</a><ul>
+<li><a class="reference internal" href="#module-scdc.initial.matrix_element"><code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> module</a></li>
+<li><a class="reference internal" href="#module-scdc.initial.response"><code class="docutils literal notranslate"><span class="pre">response</span></code> module</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#producing-initial-samples">Producing initial samples</a><ul>
+<li><a class="reference internal" href="#module-scdc.initial.distribution.integral"><code class="docutils literal notranslate"><span class="pre">integral</span></code> module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="analysis.html"
+                        title="previous chapter">Analysis tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="using.html"
+                        title="next chapter">Using the code</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/initial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using.html" title="Using the code"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="analysis.html" title="Analysis tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Initial distribution</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, the authors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.0.
+    </div>
+  </body>
+</html>

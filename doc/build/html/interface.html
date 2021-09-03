@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Batch interface &#8212; scdc 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Using the code" href="using.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using.html" title="Using the code"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="using.html" accesskey="U">Using the code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Batch interface</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="batch-interface">
+<h1>Batch interface<a class="headerlink" href="#batch-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-scdc.mpi.base">
+<span id="mpi-capabilities"></span><h2>MPI capabilities<a class="headerlink" href="#module-scdc.mpi.base" title="Permalink to this headline">¶</a></h2>
+<p>This module defines a custom MPI scatter-gather manager. It can be used
+independently of the remainder of the code.</p>
+<span class="target" id="module-scdc.mpi.sim"></span><p>This module enables parallelized down-conversion using MPI.</p>
+<dl class="py function">
+<dt id="scdc.mpi.sim.particle_as_dict">
+<code class="sig-prename descclassname">scdc.mpi.sim.</code><code class="sig-name descname">particle_as_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.mpi.sim.particle_as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code> object to a lightweight dict.</p>
+<p>The dictionary form has keys ‘shortname’, ‘momentum’, and ‘cos_theta’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code>) – particle to convert to a dict.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a simple dictionary form of the particle.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="scdc.mpi.sim.particle_from_dict">
+<code class="sig-prename descclassname">scdc.mpi.sim.</code><code class="sig-name descname">particle_from_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">material</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.mpi.sim.particle_from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the output of <cite>particle_as_dict</cite> back to an object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>dict</em>) – dictionary to convert to a particle.</p></li>
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – the material to use for this particle.
+Material data is not included in the dict representation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>an object form of the dict.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Particle</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-scdc.mpi.initial"></span><p>This module enables parallelized initial-QP sampling using MPI.</p>
+</div>
+<div class="section" id="module-scdc.interface">
+<span id="command-line-interface"></span><h2>Command-line interface<a class="headerlink" href="#module-scdc.interface" title="Permalink to this headline">¶</a></h2>
+<p>This module defines utilities for running ensembles through the command
+line or batch queue.</p>
+<p>Runs are defined by a configuration file in json format. The json file should
+have the following keys:</p>
+<blockquote>
+<div><p>outfile: path to the output file. Extension will be appended if missing.
+copies: number of copies of the initial state to run. Defaults to 1.
+initial: initial state to use.</p>
+<blockquote>
+<div><ul>
+<li><dl>
+<dt>If a string, this is taken to be the path to a file. The file should</dt><dd><p>have columns of the form</p>
+<blockquote>
+<div><p>pDM  cDM  p1  c1  p2  c2</p>
+</div></blockquote>
+<p>where <cite>p</cite> and <cite>c</cite> are the momentum and cos(theta) for the DM, QP1,
+and QP2, respectively.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>If a dict, this is taken to specify the parameters of an initial</dt><dd><dl class="simple">
+<dt>state. In this case, the allowed keys are:</dt><dd><ul class="simple">
+<li><p><cite>momentum</cite></p></li>
+<li><p><cite>energy</cite></p></li>
+<li><p><cite>shortname</cite></p></li>
+<li><p><cite>cos_theta</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p>Exactly one of <cite>energy</cite> and <cite>momentum</cite> must be specified. Any of
+these keys may be given as a list of values. In this case, one
+enemble is produced for each value in the list (or for each
+combination of list values, if applicable).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>material: material data to use (dict).</dt><dd><ul class="simple">
+<li><p>If omitted or null, the default is <cite>materials.Aluminum</cite>.</p></li>
+<li><dl class="simple">
+<dt>Allowed keys are:</dt><dd><ul>
+<li><p><cite>gamma</cite></p></li>
+<li><p><cite>c_s</cite></p></li>
+<li><p><cite>T_c</cite></p></li>
+<li><p><cite>Delta</cite></p></li>
+<li><p><cite>E_F</cite></p></li>
+<li><p><cite>m_star</cite></p></li>
+<li><p><cite>beta</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Any keys omitted are taken from the default (<cite>materials.Aluminum</cite>).</p></li>
+<li><dl class="simple">
+<dt>As with the <cite>initial</cite> key, any values specified as lists will produce</dt><dd><p>one ensemble for each value or combination of values.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>params: an arbitrary dict of additional labels with primitive values.</p>
+</div></blockquote>
+<dl class="py class">
+<dt id="scdc.interface.Configuration">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interface.</code><code class="sig-name descname">Configuration</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.Configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configuration generator for multi-task downconversion runs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outfile</strong> (<em>str</em>) – path to the output file. Extension will be appended
+if missing.</p></li>
+<li><p><strong>copies</strong> (<em>int</em><em>, </em><em>optional</em>) – number of copies to run. Defaults to 1.</p></li>
+<li><p><strong>initial</strong> (<em>object</em>) – initial particle specification.</p></li>
+<li><p><strong>n_initial</strong> (<em>int</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – number of initial particles to
+select for downconversion. Selection is random with replacement. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, use all initial particles. A two-layer dict may be
+provided using the mediator mass and DM mass as keys, with an
+‘other’ entry as a fallback. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>material</strong> (<em>object</em>) – material specification.</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – arbitrary parameter dict for labels.
+Defaults to <cite>{}</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.outfile">
+<code class="sig-name descname">outfile</code><a class="headerlink" href="#scdc.interface.Configuration.outfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>original outfile specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.copies">
+<code class="sig-name descname">copies</code><a class="headerlink" href="#scdc.interface.Configuration.copies" title="Permalink to this definition">¶</a></dt>
+<dd><p>original copies specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.material">
+<code class="sig-name descname">material</code><a class="headerlink" href="#scdc.interface.Configuration.material" title="Permalink to this definition">¶</a></dt>
+<dd><p>original material specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.params">
+<code class="sig-name descname">params</code><a class="headerlink" href="#scdc.interface.Configuration.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>original params specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.materials">
+<code class="sig-name descname">materials</code><a class="headerlink" href="#scdc.interface.Configuration.materials" title="Permalink to this definition">¶</a></dt>
+<dd><p>material specifications.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.ensemble_tasks">
+<code class="sig-name descname">ensemble_tasks</code><a class="headerlink" href="#scdc.interface.Configuration.ensemble_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>one task per
+ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#scdc.interface.EnsembleTask" title="scdc.interface.EnsembleTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnsembleTask</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.Configuration.task_by_id">
+<code class="sig-name descname">task_by_id</code><a class="headerlink" href="#scdc.interface.Configuration.task_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>a dictionary mapping ensemble task IDs to
+<cite>EnsembleTask</cite> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="scdc.interface.Configuration.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.Configuration.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save an HDF5 representation of this run and the output.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.interface.EnsembleTask">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interface.</code><code class="sig-name descname">EnsembleTask</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.EnsembleTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container class for single ensembles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code>) – initial events.</p></li>
+<li><p><strong>material</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code>) – material object.</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – arbitrary parameter dict for labels.
+Defaults to <cite>{}</cite>.</p></li>
+<li><p><strong>task_id</strong> (<em>object</em><em>, </em><em>optional</em>) – a label for this task. Defaults to <cite>None</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="scdc.interface.EnsembleTask.initial">
+<code class="sig-name descname">initial</code><a class="headerlink" href="#scdc.interface.EnsembleTask.initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>initial events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.EnsembleTask.material">
+<code class="sig-name descname">material</code><a class="headerlink" href="#scdc.interface.EnsembleTask.material" title="Permalink to this definition">¶</a></dt>
+<dd><p>material object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Material</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.EnsembleTask.params">
+<code class="sig-name descname">params</code><a class="headerlink" href="#scdc.interface.EnsembleTask.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>arbitrary parameter dict for labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.EnsembleTask.task_id">
+<code class="sig-name descname">task_id</code><a class="headerlink" href="#scdc.interface.EnsembleTask.task_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>a label for this task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="scdc.interface.EnsembleTask.result">
+<code class="sig-name descname">result</code><a class="headerlink" href="#scdc.interface.EnsembleTask.result" title="Permalink to this definition">¶</a></dt>
+<dd><p>results of running this task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.interface.InitialConfiguration">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interface.</code><code class="sig-name descname">InitialConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.InitialConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configuration generator for multi-task initial-particle runs.</p>
+<p>At present, it is assumed that only the DM and mediator mass vary. The
+velocity is fixed to 1e-3.</p>
+<dl class="py method">
+<dt id="scdc.interface.InitialConfiguration.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.InitialConfiguration.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save an HDF5 representation of this run and the output.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="scdc.interface.InitialTask">
+<em class="property">class </em><code class="sig-prename descclassname">scdc.interface.</code><code class="sig-name descname">InitialTask</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.InitialTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container class for single initial-ensemble generation tasks.</p>
+<p>At present, it is assumed that only the DM and mediator mass vary. The
+velocity is fixed to 1e-3.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="scdc.interface.expand_dict">
+<code class="sig-prename descclassname">scdc.interface.</code><code class="sig-name descname">expand_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="headerlink" href="#scdc.interface.expand_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand a dict of lists to a list of dicts.</p>
+<p>The idea is to take a dict for which some values are iterable, and convert
+this to a single list of dicts, each of which has no listlike values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<em>dict</em>) – dict to expand.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>expanded list of dicts.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Batch interface</a><ul>
+<li><a class="reference internal" href="#module-scdc.mpi.base">MPI capabilities</a></li>
+<li><a class="reference internal" href="#module-scdc.interface">Command-line interface</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="using.html"
+                        title="previous chapter">Using the code</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/interface.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="using.html" title="Using the code"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scdc 1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="using.html" >Using the code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Batch interface</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, the authors.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.0.
+    </div>
+  </body>
+</html>

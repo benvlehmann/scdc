@@ -1,0 +1,14 @@
+*pyc
+*DS_Store
+*_build
+*__pycache__
+*egg-info
+*.aux
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.toc
