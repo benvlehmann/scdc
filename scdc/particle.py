@@ -186,7 +186,7 @@ class Phonon(Particle):
             float: phonon energy in material units.
 
         """
-        return 2*self.material.gamma*np.sqrt(self.material.z)
+        return (self.material.hbar_m * self.material.c_s) * k
 
     def dispersion_inverse(self, E):
         """Inverse dispersion relation for phonons.
